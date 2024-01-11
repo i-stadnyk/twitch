@@ -16,6 +16,8 @@ const Sidebar = async () => {
 	const recommended = await getRecommended()
 	const following = await getFollowedUsers()
 
+	// console.log(recommended)
+
 	return (
 		<Wrapper>
 			<div className='space-y-4 pt-4 lg:pt-0'>

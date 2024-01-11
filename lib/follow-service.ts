@@ -16,7 +16,17 @@ export const getFollowedUsers = async () => {
 					}
 				}
 			},
-			include: { following: true }
+			include: {
+				following: {
+					include: {
+						stream: {
+							select: {
+								isLive: true
+							}
+						}
+					}
+				}
+			}
 		})
 
 		return followedUsers
@@ -33,8 +43,13 @@ export const isFollowingUser = async (id: string) => {
 			where: { id }
 		})
 
-		if (!otherUser) throw new Error('User not found')
-		if (otherUser.id === self.id) return true
+		if (!otherUser) {
+			throw new Error('User not found')
+		}
+
+		if (otherUser.id === self.id) {
+			return true
+		}
 
 		const existingFollow = await db.follow.findFirst({
 			where: {
@@ -56,8 +71,13 @@ export const followUser = async (id: string) => {
 		where: { id }
 	})
 
-	if (!otherUser) throw new Error('User not found')
-	if (otherUser.id === self.id) throw new Error('Cannot follow yourself')
+	if (!otherUser) {
+		throw new Error('User not found')
+	}
+
+	if (otherUser.id === self.id) {
+		throw new Error('Cannot follow yourself')
+	}
 
 	const existingFollow = await db.follow.findFirst({
 		where: {
@@ -66,7 +86,9 @@ export const followUser = async (id: string) => {
 		}
 	})
 
-	if (existingFollow) throw new Error('Already following')
+	if (existingFollow) {
+		throw new Error('Already following')
+	}
 
 	const follow = await db.follow.create({
 		data: {
@@ -86,11 +108,18 @@ export const unfollowUser = async (id: string) => {
 	const self = await getSelf()
 
 	const otherUser = await db.user.findUnique({
-		where: { id }
+		where: {
+			id
+		}
 	})
 
-	if (!otherUser) throw new Error('User not found')
-	if (otherUser.id === self.id) throw new Error('Cannot unfollow yourself')
+	if (!otherUser) {
+		throw new Error('User not found')
+	}
+
+	if (otherUser.id === self.id) {
+		throw new Error('Cannot unfollow yourself')
+	}
 
 	const existingFollow = await db.follow.findFirst({
 		where: {
@@ -99,7 +128,9 @@ export const unfollowUser = async (id: string) => {
 		}
 	})
 
-	if (!existingFollow) throw new Error('Not following')
+	if (!existingFollow) {
+		throw new Error('Not following')
+	}
 
 	const follow = await db.follow.delete({
 		where: {
